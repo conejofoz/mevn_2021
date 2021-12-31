@@ -8,6 +8,15 @@ import express from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
 import path from 'path'
+import mongoose from 'mongoose'
+
+mongoose.Promise = global.Promise
+const dbUrl = 'mongodb://localhost:27017/dbsistema'
+//mongoose.connect(dbUrl, {useCreateIndex:true, useNewUrlParser:true})
+mongoose.connect(dbUrl, {useNewUrlParser:true})
+.then(mongoose => console.log('Conectado ao banco de dados na porta 27017'))
+.catch(err => console.log(err))
+
 
 const app=express()
 app.use(morgan('dev'))
