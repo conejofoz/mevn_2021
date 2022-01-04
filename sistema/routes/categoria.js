@@ -4,8 +4,9 @@ import CategoriaController from '../controllers/CategoriaController'
 const router = routefx()
 
 router.post('/add', CategoriaController.add)
-router.get('/query', CategoriaController.query)
 router.get('/list', CategoriaController.list)
+router.get('/query', CategoriaController.query)
+//router.get('/:_id', CategoriaController.query)
 router.put('/update', CategoriaController.update)
 router.delete('/remove', CategoriaController.remove)
 router.patch('/activate', CategoriaController.activate)
