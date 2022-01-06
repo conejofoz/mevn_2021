@@ -1,9 +1,10 @@
 import routefx from 'express-promise-router'
 import ArticuloController from '../controllers/ArticuloController'
+import auth from '../middlewares/auth'
 
 const router = routefx()
 
-router.post('/add', ArticuloController.add)
+router.post('/add', auth.verifyAlmacenero, ArticuloController.add)
 router.get('/list', ArticuloController.list)
 router.get('/query', ArticuloController.query)
 router.put('/update', ArticuloController.update)
