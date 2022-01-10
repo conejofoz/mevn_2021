@@ -12,7 +12,7 @@ import mongoose from 'mongoose'
 import router from './routes' //index.js
 
 mongoose.Promise = global.Promise
-const dbUrl = 'mongodb://localhost:27017/dbsistema'
+const dbUrl = 'mongodb://localhost:27017/dbsistemasp'
 //mongoose.connect(dbUrl, {useCreateIndex:true, useNewUrlParser:true})
 mongoose.connect(dbUrl, {useNewUrlParser:true})
 .then(mongoose => console.log('Conectado ao banco de dados na porta 27017'))

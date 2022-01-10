@@ -4,7 +4,8 @@ import auth from '../middlewares/auth'
 
 const router = routefx()
 
-router.post('/add', auth.verifyAlmacenero, CategoriaController.add)
+//router.post('/add', auth.verifyAlmacenero, CategoriaController.add)
+router.post('/add', CategoriaController.add)
 router.get('/list', CategoriaController.list)
 router.get('/query', CategoriaController.query)
 //router.get('/:_id', CategoriaController.query)
