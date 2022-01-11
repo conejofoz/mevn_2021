@@ -6,7 +6,7 @@ const router = routefx()
 
 //router.post('/add', auth.verifyAlmacenero, CategoriaController.add)
 router.post('/add', CategoriaController.add)
-router.get('/list', CategoriaController.list)
+router.get('/list', auth.verifyAlmacenero, CategoriaController.list)
 router.get('/query', CategoriaController.query)
 //router.get('/:_id', CategoriaController.query)
 router.put('/update', CategoriaController.update)

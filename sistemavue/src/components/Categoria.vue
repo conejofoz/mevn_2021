@@ -161,7 +161,9 @@
         methods: {
             listar(){
                 let me = this
-                axios.get('categoria/list').then(function(response){
+                let header={"Token": this.$store.state.token}
+                let configuracion = {headers: header}
+                axios.get('categoria/list', configuracion).then(function(response){
                     //console.log(response)
                     me.categorias = response.data
                 }).catch(function(error){
