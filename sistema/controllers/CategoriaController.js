@@ -32,7 +32,7 @@ export default{
         try {
             let valor = req.query.valor
             //const reg = await models.Categoria.find({'nombre': new RegExp(valor, 'i')},{createdAt:0}).sort({'nombre':1})
-            const reg = await models.Categoria.find({$or:[{'nombre': new RegExp(valor, 'i')},{'description': new RegExp(valor, 'i')}]},{createdAt:0}).sort({'nombre':1})
+            const reg = await models.Categoria.find({$or:[{'nombre': new RegExp(valor, 'i')},{'descriction': new RegExp(valor, 'i')}]},{createdAt:0}).sort({'nombre':1})
             res.status(200).json(reg)
         } catch (e) {
             res.status(500).send({
@@ -45,7 +45,7 @@ export default{
         try {
             const reg = await models.Categoria.findByIdAndUpdate({_id:req.body._id},{
                 nombre:req.body.nombre, 
-                description:req.body.description
+                descripcion:req.body.descripcion
             })
             res.status(200).json(reg)
         } catch (e) {

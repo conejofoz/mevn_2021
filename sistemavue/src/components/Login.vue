@@ -34,11 +34,15 @@ export default {
     methods: {
         ingresar(){
             axios.post('usuario/login',{email: this.email, password: this.password})
-            .then(function(response){
-                console.log(response.data.user)
-                console.log(response.data.tokenReturn)
-            }).catch(function(error){
-                console.log(error)
+            .then(respuesta =>{
+                return respuesta.data
+            })
+            .then(data =>{
+                this.$store.dispatch("guardarToken", data.tokenReturn)
+                this.$router.push({name:'home'})
+            })
+            .catch(error =>{
+                console.log(error.name)
             })
         },
     },  

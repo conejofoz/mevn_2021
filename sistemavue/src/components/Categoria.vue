@@ -101,7 +101,7 @@
                     </template>
                 </td>
                 <td>{{ props.item.nombre }}</td>
-                <td>{{ props.item.description }}</td>
+                <td>{{ props.item.descripcion }}</td>
                 <td>
                     <div v-if="props.item.estado">
                         <span class="blue--text">Activo</span>
@@ -129,7 +129,7 @@
                 headers: [
                 { text: 'Opciones', value: 'opciones', sortable: true },
                 { text: 'Nombre', value: 'nombre', sortable: true },
-                { text: 'Descripcion', value: 'description', sortable: false },
+                { text: 'Descripcion', value: 'descripcion', sortable: false },
                 { text: 'Estado', value: 'estado', sortable: false }
                 ],
                 desserts: [],
@@ -171,10 +171,13 @@
             validar(){
                 this.valida = 0
                 this.validaMensaje = []
-                if(this.nombre.length<1 || this.nombre.length>50){
+                if(this.nombre.length < 1 || this.nombre.length > 50){
                     this.validaMensaje.push('El nombre de la categoria debe tener entre 1-50 caracteres')
                 }
-                if(this.descripcion.length>255){
+                /* if(this.descripcion.length > 255){
+                    this.validaMensaje.push('La descripcion no deve tener mas de 255 caracteres')
+                } */
+                if(this.descripcion.length > 255){
                     this.validaMensaje.push('La descripcion no deve tener mas de 255 caracteres')
                 }
                 if(this.validaMensaje.length){
@@ -188,12 +191,13 @@
                 if(this.validar()){
                     return
                 }
+                
                 if(this.editedIndex > -1){
                     //editar
                     axios.put('categoria/update', {
                         '_id': this._id,
                         'nombre':this.nombre,
-                        'description':this.descripcion
+                        'descripcion':this.descripcion
                     })
                     .then(function(response){
                         me.limpiar()
@@ -207,7 +211,7 @@
                     //guardar
                     axios.post('categoria/add', {
                         'nombre':this.nombre,
-                        'description':this.descripcion
+                        'descripcion':this.descripcion
                     })
                     .then(function(response){
                         me.limpiar()
@@ -275,7 +279,7 @@
             editItem (item) {
                 this._id = item._id
                 this.nombre = item.nombre
-                this.descripcion = item.description
+                this.descripcion = item.descripcion
                 this.dialog = true
                 this.editedIndex = 1
             },
@@ -286,7 +290,7 @@
             },
 
             close () {
-                //this.dialog = false
+                this.dialog = false
             },
         }
     }
