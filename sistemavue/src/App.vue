@@ -177,8 +177,11 @@
         <span class="hidden-sm-and-down">Sistema</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon>
-        <v-icon>apps</v-icon>
+      <v-btn @click="salir()" icon v-if="logueado">
+        <v-icon>logout</v-icon> Salir
+      </v-btn>
+      <v-btn :to="{name: 'login'}" icon v-else> 
+        <v-icon>apps</v-icon> Login
       </v-btn>
     </v-toolbar>
     <v-content>
@@ -231,7 +234,9 @@ export default {
     return this.$store.dispatch("autoLogin")
   },
   methods: {
-    
+    salir(){
+      this.$store.dispatch("salir")
+    }
   },
 }
 </script>
