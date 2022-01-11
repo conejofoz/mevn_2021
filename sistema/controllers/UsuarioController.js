@@ -113,6 +113,7 @@ export default{
                     let tokenReturn = await token.encode(user._id, user.rol, user.email)
                     res.status(200).json({user, tokenReturn})
                 } else {
+                    //res.status(404).send({message: 'Password Incorrecto'})
                     res.status(404).send({message: 'Password Incorrecto'})
                 }
             } else {

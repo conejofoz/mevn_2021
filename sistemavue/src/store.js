@@ -19,7 +19,7 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    guardarToken({commit, token}){
+    guardarToken({commit}, token){
       commit("setToken", token)
       commit("setUsuario", decode(token))
       localStorage.setItem("token", token)

@@ -9,6 +9,7 @@
                 <v-card-text>
                     <v-text-field v-model="email" autofocus color="accent" label="Email" required></v-text-field>
                     <v-text-field v-model="password" type="password" color="accent" label="Password" required></v-text-field>
+                    <v-flex class="red--text" v-if="errorM">{{errorM}}</v-flex>
                 </v-card-text>
 
                 <v-card-actions class="px-3 pb-3">
@@ -28,7 +29,8 @@ export default {
     data(){
         return{
             email:'',
-            password:''
+            password:'',
+            errorM:null
         }
     },
     methods: {
@@ -42,7 +44,13 @@ export default {
                 this.$router.push({name:'home'})
             })
             .catch(error =>{
-                console.log(error.name)
+                //console.log(error)
+                this.errorM=null
+                if(error.response.status==404){
+                    this.errorM='No existe el usuario o las credenciales son incorrectas'
+                } else {
+                       this.errorM='Ocurrio un error con el servidor'
+                }
             })
         },
     },  
