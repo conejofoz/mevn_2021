@@ -4,6 +4,7 @@ import store from './store'
 import Home from './views/Home.vue'
 import Categoria from './components/Categoria.vue'
 import Login from './components/Login.vue'
+import Usuario from './components/Usuario.vue'
 
 Vue.use(Router)
 
@@ -30,6 +31,14 @@ var router = new Router({
         administrador: true,
         almacenero: true,
         vendedor:false
+      }
+    },
+    {
+      path: '/usuario',
+      name: 'usuario',
+      component: Usuario,
+      meta:{
+        administrador: true,
       }
     },
     {
