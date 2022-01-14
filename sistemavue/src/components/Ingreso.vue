@@ -24,37 +24,7 @@
                         <v-card-text>
                         <v-container grid-list-md>
                             <v-layout wrap>
-                                <v-flex xs12 sm6 md6>
-                                    <v-text-field v-model="nombre" label="Nombre"></v-text-field>
-                                </v-flex>
-                                <v-flex xs12 sm6 md6>
-                                    <v-select v-model="rol" :items="roles" label="Rol">
-
-                                    </v-select>
-                                </v-flex>
-                                <v-flex xs12 sm6 md6>
-                                    <v-select v-model="tipo_documento" :items="documentos" label="Tipo Docomento">
-
-                                    </v-select>
-                                </v-flex>
-                                <v-flex xs12 sm6 md6>
-                                    <v-text-field v-model="num_documento" label="Número Documento"></v-text-field>
-                                </v-flex>
-                                <v-flex xs12 sm6 md6>
-                                    <v-text-field v-model="direccion" label="Dirección"></v-text-field>
-                                </v-flex>
-                                <v-flex xs12 sm6 md6>
-                                    <v-text-field v-model="telefono" label="Teléfono"></v-text-field>
-                                </v-flex>
-                                <v-flex xs12 sm6 md6>
-                                    <v-text-field v-model="email" label="E-mail"></v-text-field>
-                                </v-flex>
-                                <v-flex xs12 sm6 md6>
-                                    <v-text-field type="password" v-model="password" label="Password"></v-text-field>
-                                </v-flex>
-                                <v-flex xs12 sm12 md12 v-show="valida">
-                                    <div class="red--text" v-for="v in validaMensaje" :key="v" v-text="v"></div>
-                                </v-flex>
+                                
                             </v-layout>
                         </v-container>
                         </v-card-text>
@@ -62,7 +32,6 @@
                         <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn color="blue darken-1" flat @click="close">Cancelar</v-btn>
-                        <v-btn color="blue darken-1" flat @click="guardar">Guardar</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
@@ -136,6 +105,38 @@
                 <v-btn color="primary" @click="listar()" >Reset</v-btn>
                 </template>
             </v-data-table>
+
+
+            <!-- formulario de nova compra -->
+            <v-container grid-list-sm class="pa-4 white">
+                <v-layout row wrap>
+                    <v-flex xs12 sm4 md4 lg4 xl4>
+                        <v-select v-model="tipo_comprobante" :items="comprobantes" label="Tipo Comprobante">
+
+                        </v-select>
+                    </v-flex>
+                    <v-flex xs12 sm4 md4 lg4 xl4>
+                        <v-text-field v-model="serie_comprobante" label="Serie Comprobante"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm4 md4 lg4 xl4>
+                        <v-text-field v-model="num_comprobante" label="Número Comprobante"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm8 md8 lg8 xl8>
+                        <v-autocomplete v-model="persona" :items="personas" label="Proveedor"></v-autocomplete>
+                    </v-flex>
+                    <v-flex xs12 sm8 md8 lg8 xl8>
+                        <v-text-field type="number" v-model="impuesto" label="Impuesto"></v-text-field>
+                    </v-flex>
+                </v-layout>
+            </v-container>
+            <!-- end formulario de nova compra -->
+
+
+
+
+
+
+
         </v-flex>
     </v-layout>
 </template>
