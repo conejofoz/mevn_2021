@@ -9,12 +9,11 @@
                 vertical
                 ></v-divider>
                 <v-spacer></v-spacer>
-                <v-text-field class="text-xs-center" v-model="search" append-icon="search" 
-                label="Búsqueda" single-line hide-details></v-text-field>
+                <v-text-field v-if="verNuevo==0" class="text-xs-center" v-model="search" append-icon="search" label="Búsqueda" single-line hide-details></v-text-field>
                 <v-spacer></v-spacer>
+                <v-btn @click="mostrarNuevo" color="primary" dark class="mb-2" v-if="verNuevo==0">Nuevo</v-btn>
                 <v-dialog v-model="dialog" max-width="500px">
                     <template v-slot:activator="{ on }">
-                        <v-btn color="primary" dark class="mb-2" v-on="on">Nuevo</v-btn>
                     </template>
                     <v-card>
                         <v-card-title>
@@ -64,6 +63,7 @@
                 :items="ingresos"
                 :search="search"
                 class="elevation-1"
+                v-if="verNuevo==0"
             >
                 <template v-slot:items="props">
                 <td class="justify-center layout px-0">
@@ -108,7 +108,9 @@
 
 
             <!-- formulario de nova compra -->
-            <v-container grid-list-sm class="pa-4 white">
+            
+            <!-- formulario de nova cabecera -->
+            <v-container grid-list-sm class="pa-4 white" v-if="verNuevo">
                 <v-layout row wrap>
                     <v-flex xs12 sm4 md4 lg4 xl4>
                         <v-select v-model="tipo_comprobante" :items="comprobantes" label="Tipo Comprobante">
@@ -124,11 +126,66 @@
                     <v-flex xs12 sm8 md8 lg8 xl8>
                         <v-autocomplete v-model="persona" :items="personas" label="Proveedor"></v-autocomplete>
                     </v-flex>
-                    <v-flex xs12 sm8 md8 lg8 xl8>
+                    <v-flex xs12 sm4 md4 lg4 xl4>
                         <v-text-field type="number" v-model="impuesto" label="Impuesto"></v-text-field>
                     </v-flex>
+
+
+                    <v-flex xs12 sm8 md8 lg8 xl8>
+                        <v-text-field v-model="codigo" label="Código" @keyup.enter="buscarCodigo()"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm2 md2 lg2 xl2>
+                        <v-btn small fab dark color="teal">
+                            <v-icon dark>list</v-icon>
+                        </v-btn>
+                    </v-flex>
+                    <v-flex xs12 sm2 md2 lg2 xl2 v-show="errorArticulo">
+                        <div class="red--text" v-text="errorArticulo"></div>
+                    </v-flex>
+                    
+                    <!-- detalles de ingreso -->
+                    <v-flex xs12 sm12 md12 lg12 xl12>
+                        <template>
+                            <v-data-table :headers="cabeceraDetalles" :items="detalles" class="elevation-1">
+                                <template slot="items" slot-scope="props">
+                                    <td><v-icon small class="mr-2" @click="eliminarDetalle(detalles, props.item)">delete</v-icon></td>
+                                    <td class="text-xs-center">{{props.item.articulo}}</td>
+                                    <!-- <td class="text-xs-center">{{props.item.cantidad}}</td> -->
+                                    <td class="text-xs-center"><v-text-field v-model="props.item.cantidad" type="number"></v-text-field></td>
+                                    <!-- <td class="text-xs-center">{{props.item.precio}}</td> -->
+                                    <td class="text-xs-center"><v-text-field v-model="props.item.precio" type="number"></v-text-field></td>
+                                    <td class="text-xs-center">{{props.item.cantidad * props.item.precio}}</td>
+                                </template>
+                                <template slot="no-data">
+                                    <h3>No hay artículos agregados al detalle</h3>
+                                </template>
+                            </v-data-table>
+                            <v-flex class="text-xs-right">
+                                <strong>Total Parcial:</strong> $ {{totalParcial=(total-totalImpuesto).toFixed(2)}}
+                            </v-flex>
+                            <v-flex class="text-xs-right">
+                                <strong>Total Impuesto:</strong> $ {{totalImpuesto=((total*impuesto)/(1+impuesto)).toFixed(2)}}
+                            </v-flex>
+                            <v-flex class="text-xs-right">
+                                <strong>Total Neto:</strong> $ {{total=calcularTotal}}
+                            </v-flex>
+                        </template>
+                    </v-flex>
+                    <v-flex xs12 sm12 md12 v-show="valida">
+                        <div class="red--text" v-for="v in validaMensaje" :key="v" v-text="v"></div>
+                    </v-flex>
+
+
+                    <v-flex xs12 sm12 md12 lg12 xl12>
+                        <v-btn color="blue darken-1" flat @click.native="ocultarNuevo()">Cancelar</v-btn>
+                        <v-btn color="success" flat @click.native="guardar()">Guardar</v-btn>
+                    </v-flex>
+
                 </v-layout>
             </v-container>
+            
+
+            
             <!-- end formulario de nova compra -->
 
 
@@ -163,16 +220,30 @@
                 desserts: [],
                 editedIndex: -1,
                 _id:'',
-                nombre:'',
-                rol:'',
-                roles:['Administrador', 'Almacenero', 'Vendedor'],
-                documentos:['DNI', 'RUC', 'PASAPORTE', 'CEDULA'],
-                num_documento:'',
-                tipo_documento:'',
-                direccion:'',
-                telefono:'',
-                email:'',
-                password:'',
+                persona:'',
+                personas:[],
+                tipo_comprobante:'',
+                comprobantes:['BOLETA', 'FACTURA', 'TICKET', 'GUIA'],
+                serie_comprobante:'',
+                num_comprobante:'',
+                impuesto:0.18,
+                codigo:'',
+                cabeceraDetalles:[
+                    { text: 'Borrar', value: 'borrar', sortable: false},
+                    { text: 'Artículo', value: 'articulo', sortable: false},
+                    { text: 'Cantidad', value: 'cantidad', sortable: false},
+                    { text: 'Precio', value: 'precio', sortable: false},
+                    { text: 'Sub Total', value: 'subtotal', sortable: false},
+                ],
+                detalles:[
+                    //{_id: '1000', articulo: 'Articulo 1', cantidad: '5', precio: '10'},
+                    //{_id: '2000', articulo: 'Articulo 2', cantidad: '5', precio: '20'}
+                ],
+                verNuevo:0,
+                errorArticulo:null,
+                total:0,
+                totalParcial:0,
+                totalImpuesto:0,
                 valida:0,
                 validaMensaje:[],
                 adModal:0,
@@ -184,6 +255,13 @@
         computed: {
             formTitle () {
             return this.editedIndex === -1 ? 'Nuevo registro' : 'Editar registro'
+            },
+            calcularTotal:function(){
+                let resultado = 0.0
+                for (let i = 0; i < this.detalles.length; i++) {
+                    resultado=resultado+(this.detalles[i].cantidad*this.detalles[i].precio);
+                }
+                return resultado
             }
         },
         watch: {
@@ -193,8 +271,68 @@
         },
         created () {
             this.listar()
+            this.selectPersona()
         },
         methods: {
+            selectPersona(){
+                let me = this
+                let personaArray = []
+                let header={"Token": this.$store.state.token}
+                let configuracion = {headers: header}
+                axios.get('persona/listProveedores', configuracion).then(function(response){
+                    personaArray = response.data
+                    personaArray.map(function(x){
+                        me.personas.push({text:x.nombre, value:x._id})
+                    })
+                }).catch(function(error){
+                    console.log(error)
+                })
+            },
+            buscarCodigo(){
+                let me = this
+                me.errorArticulo = null
+                let header={"Token": this.$store.state.token}
+                let configuracion = {headers: header}
+                axios.get('articulo/queryCodigo?codigo='+this.codigo, configuracion).then(function(response){
+                    //console.log(response)
+                    me.agregarDetalle(response.data)
+                }).catch(function(error){
+                    //console.log(error)
+                    me.errorArticulo = 'No existe el articulo'
+                })
+            },
+            agregarDetalle(data){
+                this.errorArticulo=null
+                if(this.encuentra(data._id)==true){
+                    this.errorArticulo = 'El articulo ya ha sido agregado'
+                } else {
+                    this.detalles.push(
+                        {
+                            _id:data._id,
+                            articulo:data.nombre,
+                            cantidad:1,
+                            precio:data.precio_venta
+                        }
+                    )
+                    this.codigo = ''
+                }
+            },
+            encuentra(id){
+                let sw = 0
+                for (var i = 0; i < this.detalles.length; i++) {
+                    if(this.detalles[i]._id==id){
+                        sw=true
+                    }
+                    
+                }
+                return sw
+            },
+            eliminarDetalle(detalle, item){
+                let i=detalle.indexOf(item)
+                if(i!= -1){
+                    detalle.splice(i,1)
+                }
+            },
             listar(){
                 let me = this
                 let header={"Token": this.$store.state.token}
@@ -237,6 +375,12 @@
                     this.valida = 1
                 }
                 return this.valida
+            },
+            mostrarNuevo(){
+                this.verNuevo = 1
+            },
+            ocultarNuevo(){
+                this.verNuevo = 0
             },
             guardar(){
                 let me = this
