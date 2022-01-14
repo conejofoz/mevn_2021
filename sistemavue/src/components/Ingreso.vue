@@ -12,18 +12,59 @@
                 <v-text-field v-if="verNuevo==0" class="text-xs-center" v-model="search" append-icon="search" label="Búsqueda" single-line hide-details></v-text-field>
                 <v-spacer></v-spacer>
                 <v-btn @click="mostrarNuevo" color="primary" dark class="mb-2" v-if="verNuevo==0">Nuevo</v-btn>
-                <v-dialog v-model="dialog" max-width="500px">
-                    <template v-slot:activator="{ on }">
-                    </template>
+                <!-- MODAL CONSULTA ARTICULOS -->
+                <v-dialog v-model="dialog" max-width="1000px">
+                    
                     <v-card>
                         <v-card-title>
-                        <span class="headline">{{ formTitle }}</span>
+                            <span class="headline">Seleccione un articulo</span>
                         </v-card-title>
             
                         <v-card-text>
                         <v-container grid-list-md>
                             <v-layout wrap>
-                                
+                                <v-flex xs12 sm12 md12 lg12 xl12>
+
+                                    <v-text-field 
+                                        v-model="texto" @keyup.enter="listarArticulos()" 
+                                        class="text-xs-center" append-icon="search" label="Búsqueda">
+                                    </v-text-field>
+
+                                    <template>
+                                        <v-data-table
+                                            :headers="cabeceraArticulos"
+                                            :items="articulos"
+                                            class="elevation-1"
+                                        >
+                                            <template v-slot:items="props">
+                                            <td class="justify-center layout px-0">
+                                                <v-icon
+                                                small
+                                                class="mr-2"
+                                                @click="agregarDetalle(props.item)"
+                                                >
+                                                add
+                                                </v-icon>
+                                            </td>
+                                            <td>{{ props.item.codigo }}</td>
+                                            <td>{{ props.item.nombre }}</td>
+                                            <td>{{ props.item.categoria.nombre }}</td>
+                                            <td>{{ props.item.stock }}</td>
+                                            <td>{{ props.item.precio_venta }}</td>
+                                            <td>{{ props.item.description }}</td>
+                                            <td>
+                                                <div v-if="props.item.estado">
+                                                    <span class="blue--text">Activo</span>
+                                                </div>
+                                                <div v-else>
+                                                    <span class="red--text">Inactivo</span>
+                                                </div>
+                                            </td>
+                                            </template>
+                                            
+                                        </v-data-table>
+                                    </template>
+                                </v-flex>
                             </v-layout>
                         </v-container>
                         </v-card-text>
@@ -135,7 +176,7 @@
                         <v-text-field v-model="codigo" label="Código" @keyup.enter="buscarCodigo()"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2 lg2 xl2>
-                        <v-btn small fab dark color="teal">
+                        <v-btn small fab dark color="teal" @click="mostrarModalArticulos()">
                             <v-icon dark>list</v-icon>
                         </v-btn>
                     </v-flex>
@@ -244,6 +285,18 @@
                 total:0,
                 totalParcial:0,
                 totalImpuesto:0,
+                articulos:[],
+                texto:'',
+                cabeceraArticulos: [
+                { text: 'Seleccionar', value: 'seleccionar', sortable: false },
+                { text: 'Código', value: 'codigo', sortable: false },
+                { text: 'Nombre', value: 'nombre', sortable: true },
+                { text: 'Categoria', value: 'categoria.nombre', sortable: true },
+                { text: 'Stock', value: 'stock', sortable: false },
+                { text: 'Precio Venta', value: 'precio_venta', sortable: false },
+                { text: 'Descripcion', value: 'descripcion', sortable: false },
+                { text: 'Estado', value: 'estado', sortable: false }
+                ],
                 valida:0,
                 validaMensaje:[],
                 adModal:0,
@@ -343,6 +396,19 @@
                 }).catch(function(error){
                     console.log(error)
                 })
+            },
+            listarArticulos(){
+                let me = this
+                let header={"Token": this.$store.state.token}
+                let configuracion = {headers: header}
+                axios.get('articulo/list?valor='+this.texto, configuracion).then(function(response){
+                    me.articulos = response.data
+                }).catch(function(error){
+                    console.log(error)
+                })
+            },
+            mostrarModalArticulos(){
+                this.dialog = 1
             },
             validar(){
                 this.valida = 0

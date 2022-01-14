@@ -51,7 +51,7 @@ export default{
             //const reg = await models.Articulo.find({'nombre': new RegExp(valor, 'i')},{createdAt:0}).sort({'nombre':1})
             const reg = await models.Articulo.find({$or:[{'nombre': new RegExp(valor, 'i')},{'description': new RegExp(valor, 'i')}]},{createdAt:0})
             .populate('categoria', {nombre:1})
-            .sort({'nombre':1})
+            .sort({'nombre':-1})
             res.status(200).json(reg)
         } catch (e) {
             res.status(500).send({
