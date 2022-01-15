@@ -4,7 +4,7 @@ import auth from '../middlewares/auth'
 
 const router = routefx()
 
-router.post('/add', auth.verifyUsuario, PersonaController.add)
+router.post('/add', PersonaController.add)
 router.get('/list', PersonaController.list)
 router.get('/listClientes', auth.verifyUsuario, PersonaController.listClientes)
 router.get('/listProveedores', auth.verifyUsuario, PersonaController.listProveedores)
