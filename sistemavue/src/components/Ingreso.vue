@@ -108,6 +108,9 @@
             >
                 <template v-slot:items="props">
                 <td class="justify-center layout px-0">
+                    <v-icon small class="mr-2" @click="verIngreso(props.item)">
+                        tab
+                    </v-icon>
                     <template v-if="props.item.estado">
                         <v-icon
                         small
@@ -219,7 +222,7 @@
 
                     <v-flex xs12 sm12 md12 lg12 xl12>
                         <v-btn color="blue darken-1" flat @click.native="ocultarNuevo()">Cancelar</v-btn>
-                        <v-btn color="success" flat @click.native="guardar()">Guardar</v-btn>
+                        <v-btn color="success" v-if="verDetalle==0" flat @click.native="guardar()">Guardar</v-btn>
                     </v-flex>
 
                 </v-layout>
@@ -297,6 +300,7 @@
                 { text: 'Descripcion', value: 'descripcion', sortable: false },
                 { text: 'Estado', value: 'estado', sortable: false }
                 ],
+                verDetalle:0,
                 valida:0,
                 validaMensaje:[],
                 adModal:0,
@@ -405,6 +409,31 @@
                     console.log(error)
                 })
             },
+            listarDetalles(id){
+                //console.log('listar detalles' +id)
+                let me = this
+                let header={"Token": this.$store.state.token}
+                let configuracion = {headers: header}
+                axios.get('ingreso/query?_id='+id, configuracion).then(function(response){
+                    console.log(response.data.detalles)
+                    //me.articulos = response.data.detalles
+                    me.detalles = response.data.detalles
+                }).catch(function(error){
+                    console.log(error)
+                })
+            },
+            verIngreso(item){
+                this.limpiar()
+                this.tipo_comprobante = item.tipo_comprobante
+                this.serie_comprobante = item.serie_comprobante
+                this.num_comprobante = item.serie_comprobante
+                this.persona = item.persona._id
+                this.impuesto = item.impuesto
+                //console.log('ver ingreso' + item._id)
+                this.listarDetalles(item._id)
+                this.verNuevo = 1
+                this.verDetalle = 1
+            },
             mostrarModalArticulos(){
                 this.dialog = 1
             },
@@ -439,6 +468,7 @@
             },
             ocultarNuevo(){
                 this.verNuevo = 0
+                this.limpiar()
             },
             guardar(){
                 let me = this
@@ -471,7 +501,6 @@
             },
             limpiar(){
                 this._id = ''
-                this.nombre = ''
                 this.tipo_comprobante = ''
                 this.serie_comprobante = ''
                 this.num_comprobante = ''
@@ -484,11 +513,12 @@
                 this.verNuevo = 0
                 this.valida = 0
                 this.validaMensaje = []
+                this.verDetalle = 0
                 
             },
             activarDesactivarMostrar(action, item){
                 this.adModal = 1
-                this.adNombre = item.nombre
+                this.adNombre = item.num_comprobante
                 this.adId = item._id
                 if(action == 1){
                     this.adAccion =1
@@ -503,7 +533,7 @@
             },
             activar(){
                 let me = this
-                axios.patch('usuario/activate',{'_id':this.adId})
+                axios.patch('ingreso/activate',{'_id':this.adId})
                 .then(function(response){
                         me.adModal=0
                         me.adAccion=0
@@ -518,7 +548,7 @@
             },
             desactivar(){
                 let me = this
-                axios.patch('usuario/deactivate',{'_id':this.adId})
+                axios.patch('ingreso/deactivate',{'_id':this.adId})
                 .then(function(response){
                         me.adModal=0
                         me.adAccion=0
