@@ -55,9 +55,9 @@ export default{
         try {
             let valor = req.query.valor
             //const reg = await models.Venta.find({'nombre': new RegExp(valor, 'i')},{createdAt:0}).sort({'nombre':1})
-            const reg = await models.Venta.find({$or:[{'num_comprobante': new RegExp(valor, 'i')},{'serie_comprobante': new RegExp(valor, 'i')}]},{createdAt:0}).sort({'nombre':1})
+            const reg = await models.Venta.find({$or:[{'num_comprobante': new RegExp(valor, 'i')},{'serie_comprobante': new RegExp(valor, 'i')}]}).sort({'nombre':1})
             .populate('usuario', {nombre:1})
-            .populate('persona', {nombre:1})
+            .populate('persona', {nombre:1, direccion:1,num_documento:1,telefono:1,email:1})
             res.status(200).json(reg)
         } catch (e) {
             res.status(500).send({

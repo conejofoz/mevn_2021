@@ -2,6 +2,9 @@
     <v-layout align-start>
         <v-flex>
             <v-toolbar flat color="white">
+                <v-btn @click="crearPDF()">
+                    <v-icon>print</v-icon>
+                </v-btn>
                 <v-toolbar-title>Artículos</v-toolbar-title>
                 <v-divider
                 class="mx-2"
@@ -58,7 +61,7 @@
                 </v-dialog>
 
 
-                <!-- modal pergunta -->
+                <!-- Dialogo modal para ativar e desativar -->
                 <v-dialog v-model="adModal" max-width="290">
                     <v-card>
                         <v-card-title class="headline" v-if="adAccion==1">Activar Item</v-card-title>
@@ -77,7 +80,6 @@
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
-
 
             </v-toolbar>
             <v-data-table
@@ -136,6 +138,9 @@
 </template>
 <script>
     import axios from 'axios'
+    import jsPDF from 'jspdf'
+    import autoTable from 'jspdf-autotable'
+import Articulo from '../../../sistema/models/articulo';
     export default {
         data(){
             return{
@@ -185,6 +190,74 @@
             this.selectCategoria()
         },
         methods: {
+            crearPDF3(){
+                var columns =[
+                    {title: "Nombre", dataKey: "nombre"},
+                    {title: "Código", dataKey: "codigo"},
+                    {title: "Categoría", dataKey: "categoria"},  
+                    {title: "Stock", dataKey: "stock"},
+                    {title: "Precio Venta", dataKey: "precio_venta"}
+                ];
+                var rows=[];
+
+                this.articulos.map(function(x){
+                    rows.push(
+                        {nombre:x.nombre,
+                        codigo:x.codigo,
+                        categoria:x.categoria.nombre,
+                        stock:x.stock,
+                        precio_venta:x.precio_venta}
+                    );
+                });                
+                var doc = new jsPDF('p','pt');
+                doc.autoTable(columns,rows,{
+                    margin: {top: 60},
+                    addPageContent: function(data) {
+                        doc.text("Lista de Artículos", 40, 30);
+                    }
+                });
+
+                doc.save('Articulos.pdf');
+            },
+            crearPDF(){
+                /* var columns = [
+                    { title: 'Nombre', datakey: 'nombre'},
+                    { title: 'Código', datakey: 'codigo'},
+                    { title: 'Categoria', datakey: 'categoria.nombre'},
+                    { title: 'Stock', datakey: 'stock'},
+                    { title: 'Precio Venta', datakey: 'precio_venta'},
+                ]
+ */
+                var columns =[
+                    {title: "Nombre", dataKey: "nombre"},
+                    {title: "Código", dataKey: "codigo"},
+                    {title: "Categoría", dataKey: "categoria"},  
+                    {title: "Stock", dataKey: "stock"},
+                    {title: "Precio Venta", dataKey: "precio_venta"}
+                ];
+                var rows = []
+                
+                this.articulos.map(function(x){
+                    rows.push(
+                        {
+                            nombre:x.nombre,
+                            codigo:x.codigo,
+                            categoria:x.categoria.nombre,
+                            stock:x.stock,
+                            precio_venta:x.precio_venta
+                        }
+                    ) 
+                })
+
+                var doc = new jsPDF('p', 'pt')
+                doc.autoTable(columns, rows,{
+                    margin: {top: 60},
+                    addPageContent: function(data){
+                        doc.text("Lista de Artículos", 40,30)
+                    }
+                }) 
+                doc.save('Articulos.pdf')
+            },
             selectCategoria(){
                 let me = this
                 let categoriaArray = []
