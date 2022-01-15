@@ -37,29 +37,29 @@
                                             class="elevation-1"
                                         >
                                             <template v-slot:items="props">
-                                            <td class="justify-center layout px-0">
-                                                <v-icon
-                                                small
-                                                class="mr-2"
-                                                @click="agregarDetalle(props.item)"
-                                                >
-                                                add
-                                                </v-icon>
-                                            </td>
-                                            <td>{{ props.item.codigo }}</td>
-                                            <td>{{ props.item.nombre }}</td>
-                                            <td>{{ props.item.categoria.nombre }}</td>
-                                            <td>{{ props.item.stock }}</td>
-                                            <td>{{ props.item.precio_venta }}</td>
-                                            <td>{{ props.item.description }}</td>
-                                            <td>
-                                                <div v-if="props.item.estado">
-                                                    <span class="blue--text">Activo</span>
-                                                </div>
-                                                <div v-else>
-                                                    <span class="red--text">Inactivo</span>
-                                                </div>
-                                            </td>
+                                                <td class="justify-center layout px-0">
+                                                    <v-icon
+                                                    small
+                                                    class="mr-2"
+                                                    @click="agregarDetalle(props.item)"
+                                                    >
+                                                    add
+                                                    </v-icon>
+                                                </td>
+                                                <td>{{ props.item.codigo }}</td>
+                                                <td>{{ props.item.nombre }}</td>
+                                                <td>{{ props.item.categoria.nombre }}</td>
+                                                <td>{{ props.item.stock }}</td>
+                                                <td>{{ props.item.precio_venta }}</td>
+                                                <td>{{ props.item.descripcion }}</td>
+                                                <td>
+                                                    <div v-if="props.item.estado">
+                                                        <span class="blue--text">Activo</span>
+                                                    </div>
+                                                    <div v-else>
+                                                        <span class="red--text">Inactivo</span>
+                                                    </div>
+                                                </td>
                                             </template>
                                             
                                         </v-data-table>
@@ -259,7 +259,7 @@
                 { text: 'Estado', value: 'estado', sortable: false }
                 ],
                 desserts: [],
-                editedIndex: -1,
+                
                 _id:'',
                 persona:'',
                 personas:[],
@@ -306,9 +306,7 @@
             }
         },
         computed: {
-            formTitle () {
-            return this.editedIndex === -1 ? 'Nuevo registro' : 'Editar registro'
-            },
+          
             calcularTotal:function(){
                 let resultado = 0.0
                 for (let i = 0; i < this.detalles.length; i++) {
@@ -413,29 +411,23 @@
             validar(){
                 this.valida = 0
                 this.validaMensaje = []
-                if(!this.rol){
-                    this.validaMensaje.push('Seleccione un rol.')
+                if(!this.persona){
+                    this.validaMensaje.push('Seleccione un proveedor.')
                 }
-                if(this.nombre.length < 1 || this.nombre.length > 50){
-                    this.validaMensaje.push('El nombre de usuário debe tener entre 1-50 caracteres')
+                if(!this.tipo_comprobante){
+                    this.validaMensaje.push('Seleccione un tipo de comprobante')
                 }
                 /* if(this.descripcion.length > 255){
                     this.validaMensaje.push('La descripcion no deve tener mas de 255 caracteres')
                 } */
-                if(this.num_documento.length > 20){
-                    this.validaMensaje.push('El documento no deve tener mas de 20 caracteres')
+                if(!this.num_comprobante){
+                    this.validaMensaje.push('Ingrese el número de comprobante')
                 }
-                if(this.direccion.length > 70){
-                    this.validaMensaje.push('La dirección no deve tener mas de 70 caracteres')
+                if(!this.impuesto || this.impuesto < 0 || this.impuesto > 1){
+                    this.validaMensaje.push('Ingrese un impuesto válido')
                 }
-                if(this.telefono.length > 20){
-                    this.validaMensaje.push('El telefono no deve tener mas de 20 caracteres')
-                }
-                if(this.email.length < 1 || this.email.length > 50){
-                    this.validaMensaje.push('El email de usuário debe tener entre 1-50 caracteres')
-                }
-                if(this.password.length < 1 || this.password.length > 64){
-                    this.validaMensaje.push('El password de usuário debe tener entre 1-64 caracteres')
+                if(this.detalles.length <= 0){
+                    this.validaMensaje.push('Ingrese al menos un artículo al detalle')
                 }
                 if(this.validaMensaje.length){
                     this.valida = 1
@@ -456,63 +448,43 @@
                 if(this.validar()){
                     return
                 }
+
+                axios.post('ingreso/add', {
+                    'persona':this.persona,
+                    'usuario':this.$store.state.usuario._id,
+                    'tipo_comprobante':this.tipo_comprobante,
+                    'serie_comprobante':this.serie_comprobante,
+                    'num_comprobante':this.num_comprobante,
+                    'impuesto':this.impuesto,
+                    'total':this.total,
+                    'detalles':this.detalles,
+                }, configuracion)
+                .then(function(response){
+                    me.limpiar()
+                    me.close()
+                    me.listar()
+                })
+                .catch(function(){
+                    console.log(error.response)
+                })
                 
-                if(this.editedIndex > -1){
-                    //editar
-                    axios.put('usuario/update', {
-                        '_id': this._id,
-                        'rol':this.rol,
-                        'nombre':this.nombre,
-                        'tipo_documento':this.tipo_documento,
-                        'num_documento':this.num_documento,
-                        'direccion':this.direccion,
-                        'telefono':this.telefono,
-                        'email':this.email,
-                        'password':this.password,
-                    })
-                    .then(function(response){
-                        me.limpiar()
-                        me.close()
-                        me.listar()
-                    })
-                    .catch(function(){
-                        console.log(error)
-                    })
-                } else {
-                    //guardar
-                    axios.post('usuario/add', {
-                        'rol':this.rol,
-                        'nombre':this.nombre,
-                        'tipo_documento':this.tipo_documento,
-                        'num_documento':this.num_documento,
-                        'direccion':this.direccion,
-                        'telefono':this.telefono,
-                        'email':this.email,
-                        'password':this.password,
-                    }, configuracion)
-                    .then(function(response){
-                        me.limpiar()
-                        me.close()
-                        me.listar()
-                    })
-                    .catch(function(){
-                        console.log(error.response)
-                    })
-                }
             },
             limpiar(){
                 this._id = ''
                 this.nombre = ''
-                this.tipo_documento = ''
-                this.tipo_documento = ''
-                this.num_documento = ''
-                this.direccion = ''
-                this.telefono = ''
-                this.email = ''
-                this.password = ''
+                this.tipo_comprobante = ''
+                this.serie_comprobante = ''
+                this.num_comprobante = ''
+                this.impuesto = 0
+                this.codigo = ''
+                this.total = 0
+                this.totalParcial = 0
+                this.totalImpuesto = 0
+                this.detalles = []
+                this.verNuevo = 0
                 this.valida = 0
-                this.validaMensaje =[]
-                this.editedIndex = -1
+                this.validaMensaje = []
+                
             },
             activarDesactivarMostrar(action, item){
                 this.adModal = 1
@@ -559,19 +531,7 @@
                         console.log(error)
                     })
             },
-            editItem (item) {
-                this._id = item._id
-                this.rol = item.rol
-                this.nombre = item.nombre
-                this.tipo_documento = item.tipo_documento
-                this.num_documento = item.num_documento
-                this.direccion = item.direccion
-                this.telefono = item.telefono
-                this.email = item.email
-                this.password = item.password
-                this.dialog = true
-                this.editedIndex = 1
-            },
+            
 
             deleteItem (item) {
             const index = this.desserts.indexOf(item)

@@ -48,10 +48,12 @@ export default{
     list: async(req, res, next) => {
         try {
             let valor = req.query.valor
+            console.log(valor)
             //const reg = await models.Articulo.find({'nombre': new RegExp(valor, 'i')},{createdAt:0}).sort({'nombre':1})
-            const reg = await models.Articulo.find({$or:[{'nombre': new RegExp(valor, 'i')},{'description': new RegExp(valor, 'i')}]},{createdAt:0})
+            const reg = await models.Articulo.find({$or:[{'nombre': new RegExp(valor, 'i')},{'descripcion': new RegExp(valor, 'i')}]},{createdAt:0})
             .populate('categoria', {nombre:1})
             .sort({'nombre':-1})
+            console.log(reg)
             res.status(200).json(reg)
         } catch (e) {
             res.status(500).send({
@@ -65,7 +67,7 @@ export default{
             const reg = await models.Articulo.findByIdAndUpdate({_id:req.body._id},{
                 categoria: req.body.categoria,
                 nombre:req.body.nombre, 
-                description:req.body.description,
+                descripcion:req.body.descripcion,
                 precio_venta:req.body.precio_venta,
                 stock:req.body.stock
             })
